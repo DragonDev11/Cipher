@@ -6,10 +6,10 @@
 int insert_element(HashNode** nodes_ptr, int* current_size, void* key, char type1, void* value, char type2){
     if (nodes_ptr == NULL || *nodes_ptr == NULL){
         //("NULL input for array\0");
-        return -1;
+        //return -1;
     }
 
-    if (current_size < 0){
+    if ((*current_size) < 0){
         //("Negative value for array size\0");
         return 1;
     }
@@ -43,7 +43,7 @@ int insert_element(HashNode** nodes_ptr, int* current_size, void* key, char type
             return 3;
     }
 
-    for (int i=0; i<*current_size; i++){
+    for (int i=0; i<(*current_size); i++){
         if (nodes[i].key == key_placeholder){
             free(key_placeholder);
             return 2;
@@ -78,7 +78,7 @@ int insert_element(HashNode** nodes_ptr, int* current_size, void* key, char type
             return 3;
     }
 
-    HashNode* temp = (HashNode*)realloc(nodes, (*current_size+1)*sizeof(HashNode));
+    HashNode* temp = (HashNode*)realloc(nodes, ((*current_size)+1)*sizeof(HashNode));
 
     if (temp == NULL){
         //("Failed to reallocate memory for hash nodes array\0");
@@ -97,10 +97,7 @@ int insert_element(HashNode** nodes_ptr, int* current_size, void* key, char type
         nodes[*current_size-1].next = &nodes[*current_size];
     }
 
-    *current_size++;
-
-    free(key_placeholder);
-    free(value_placeholder);
+    (*current_size)++;
 
     return 0;
 }
@@ -200,48 +197,33 @@ void* get_value(HashNode* nodes, int size, void* key, char type1){
         return NULL;
     }
 
-    void* key_placeholder;
-
-    switch (type1){
-        case 105:
-            key_placeholder = malloc(sizeof(int));
-            *(int*)key_placeholder = *(int*)key;
-            break;
-        case 99:
-            key_placeholder = malloc(sizeof(char));
-            *(char*)key_placeholder = *(char*)key;
-            break;
-        case 102:
-            key_placeholder = malloc(sizeof(float));
-            *(float*)key_placeholder = *(float*)key;
-            break;
-        case 115:
-            key_placeholder = malloc(sizeof(char*));
-            *(char**)key_placeholder = *(char**)key;
-            break;
-        case 100:
-            key_placeholder = malloc(sizeof(double));
-            *(double*)key_placeholder = *(double*)key;
-            break;
-        default:
-            return NULL;
-    }
-
-    for (int i=0; i<size; i++){
-        if (type1 == 115){
-            if (strcmp((char*)nodes[i].key, (char*)key_placeholder) == 0){
-                free(key_placeholder);
-                return nodes[i].value;
-            }
-        }else{
-            if (nodes[i].key == key_placeholder){
-                free(key_placeholder);
-                return nodes[i].value;
-            }
+    for (int i = 0; i < size; i++) {
+        switch (type1) {
+            case 'i': // int
+                if (*(int*)nodes[i].key == *(int*)key)
+                    return nodes[i].value;
+                break;
+            case 'c': // char
+                if (*(char*)nodes[i].key == *(char*)key)
+                    return nodes[i].value;
+                break;
+            case 'f': // float
+                if (*(float*)nodes[i].key == *(float*)key)
+                    return nodes[i].value;
+                break;
+            case 'd': // double
+                if (*(double*)nodes[i].key == *(double*)key)
+                    return nodes[i].value;
+                break;
+            case 's': // string
+                if (strcmp(*(char**)nodes[i].key, *(char**)key) == 0)
+                    return nodes[i].value;
+                break;
+            default:
+                return NULL;
         }
     }
-
-    free(key_placeholder);
+    
     return NULL;
 }
 /*

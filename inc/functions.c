@@ -63,6 +63,7 @@ char** generate_cipher_pattern(char* key, int key_size) {
 
 // implement encode
 char* encode(char* string, int string_size, char** cipher_pattern, char* key, int key_size) {
+    printf("%s", string);
     char* result = (char*)malloc((string_size+1)*sizeof(char));
     int t = 0;
     for (int i=0; i<string_size; i++){
@@ -75,6 +76,7 @@ char* encode(char* string, int string_size, char** cipher_pattern, char* key, in
                 }
             }
         }
+        
         t = (t+1)%key_size;
     }
     result[string_size] = '\0';
@@ -95,6 +97,7 @@ char* decode(char* encoded, int string_size, char** cipher_pattern, char* key, i
                 }
             }
         }
+        
         t = (t+1)%key_size;
     }
     result[string_size] = '\0';
@@ -105,7 +108,7 @@ char* decode(char* encoded, int string_size, char** cipher_pattern, char* key, i
 void print_to_file(FILE* file, char** cipher_pattern){
     for (int i = 0; i < 27; i++) {
         for (int j = 0; j < 27; j++) {
-            printf("%c", cipher_pattern[i][j]);
+            fprintf(file, "%c", cipher_pattern[i][j]);
         }
         fprintf(file, "\n");
     }
