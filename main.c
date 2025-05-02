@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "inc/functions.h"
 #include "inc/error_printer.h"
 #include "inc/hash_map.h"
@@ -8,14 +9,21 @@ FILE* file;
 
 int main(int argc, char* argv[]){
     //printf("%s", argv[1]);
-    if (!((argc >= 4) && (argc <= 7))){
-        printf("\nUSAGE: .\\main.exe <<mode>>\nMODES:\n\t -gen: generates a cipher pattern based on a cipher input\n\tAGRGUMENTS: <<cipher>> <<cipher_size>>\n\t -enc: encodes a regular text based on a cipher on input\n\tAGRGUMENTS: <<cipher>> <<cipher_size>> <<file_path>> <<key>> <<key_size>>\n\t -dec: decodes a regular text based on a cipher on input\n\tAGRGUMENTS: <<cipher>> <<cipher_size>> <<encoded_text_file_path>> <<key>> <<key_size>>\n\n");
-        
+    if ((strcmp(argv[1], "--v") == 0) || (strcmp(argv[1], "--version") == 0)){
+        printf("cipherx v1.0\nCopyright @DragonDev 2024-2025\n");
+        return 0;
+    }else if (!((argc >= 4) && (argc <= 7))){
+        printf("\nUSAGE: cipherx <<mode>>\nMODES:\n\t g: generates a cipher pattern based on a cipher input\n\tAGRGUMENTS: <<cipher>> <<cipher_size>>\n\t e: encodes a regular text based on a cipher on input\n\tAGRGUMENTS: <<cipher>> <<cipher_size>> <<file_path>> <<key>> <<key_size>>\n\t d: decodes a regular text based on a cipher on input\n\tAGRGUMENTS: <<cipher>> <<cipher_size>> <<encoded_text_file_path>> <<key>> <<key_size>>\n\n");
         return 0;
     }
-    char** cipher_pattern = generate_cipher_pattern(argv[2], atoi(argv[3]));;
+    char** cipher_pattern = generate_cipher_pattern(argv[2], atoi(argv[3]));
 
-    file = fopen("OUTPUT.txt", "w");
+    if (cipher_pattern == NULL){
+        printf("Error: duplicates had been found");
+        return 1;
+    }
+
+    file = fopen("output.txt", "w");
     int output_to_console = 0;
 
     if (file == NULL) {
@@ -76,9 +84,11 @@ int main(int argc, char* argv[]){
     
     switch (argv[1][0]){
         case 'g':
+            file_path = "output.txt";
             print_to_console(cipher_pattern);
             print_to_file(file, cipher_pattern);
             fclose(file);
+            printf("created %s\n", file_path);
             break;
         case 'd':
             file_path = argv[4];
@@ -108,13 +118,11 @@ int main(int argc, char* argv[]){
             text = (char*)malloc((size+1)*sizeof(char));
             i = 0;
             while ((c = fgetc(file)) != EOF){
-                if ((c != '\0')){
-                    if ((c >= 97) && (c <= 122)){
-                        c -= 32;
-                    }
-                    text[i] = c;
-                    i++;
+                if ((c >= 97) && (c <= 122)){
+                    c -= 32;
                 }
+                text[i] = c;
+                i++;
             }
 
             text[i] = '\0';
@@ -130,7 +138,7 @@ int main(int argc, char* argv[]){
 
             fprintf(file, "%s", decoded_text);
             fclose(file);
-
+            printf("created %s\n", file_path);
             break;
         case 'e':
             file_path = argv[4];
@@ -161,13 +169,11 @@ int main(int argc, char* argv[]){
             text = (char*)malloc((size+1)*sizeof(char));
             i = 0;
             while ((c = fgetc(file)) != EOF){
-                if ((c != ' ')){
-                    if ((c >= 97) && (c <= 122)){
-                        c -= 32;
-                    }
-                    text[i] = c;
-                    i++;
+                if ((c >= 97) && (c <= 122)){
+                    c -= 32;
                 }
+                text[i] = c;
+                i++;
             }
 
             text[i] = '\0';
@@ -183,10 +189,16 @@ int main(int argc, char* argv[]){
 
             fprintf(file, "%s", encoded_text);
             fclose(file);
+            printf("created %s\n", file_path);
             break;
         
         default:
             printf("\nUSAGE: .\\main.exe <<mode>>\nMODES:\n\t -gen: generates a cipher pattern based on a cipher input\tAGRGUMENTS: <<cipher>> <<cipher_size>>\n\t -enc: encodes a regular text based on a cipher on input\tAGRGUMENTS: <<cipher>> <<cipher_size>> <<file_path>> <<key>> <<key_size>>\n\t -dec: decodes a regular text based on a cipher on input\tAGRGUMENTS: <<cipher>> <<cipher_size>> <<encoded_text_file_path>> <<key>> <<key_size>>\n\n");
+            for (int i = 0; i < 27; i++) {
+                free(cipher_pattern[i]);
+            }
+            free(cipher_pattern);
+            return 1;
             break;
     }
 

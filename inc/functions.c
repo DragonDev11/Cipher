@@ -20,7 +20,7 @@ char** generate_cipher_pattern(char* key, int key_size) {
     for (int i=0; i<key_size; i++){
         unsigned char ch = key[i];
         if (ascii_seen[ch]){
-            return matrix;
+            return NULL;
         }
         ascii_seen[ch] = 1;
         cipher[i] = key[i];
@@ -63,20 +63,21 @@ char** generate_cipher_pattern(char* key, int key_size) {
 
 // implement encode
 char* encode(char* string, int string_size, char** cipher_pattern, char* key, int key_size) {
-    printf("%s", string);
     char* result = (char*)malloc((string_size+1)*sizeof(char));
     int t = 0;
     for (int i=0; i<string_size; i++){
         for (int j=1; j<27; j++){
-            if (cipher_pattern[0][j] == string[i]){
+            if (cipher_pattern[j][0] == string[i]){
                 for (int k=1; k<27; k++){
-                    if (cipher_pattern[k][j] == key[t]){
-                        result[i] = cipher_pattern[k][0];
+                    if (cipher_pattern[0][k] == key[t]){
+                        result[i] = cipher_pattern[j][k];
                     }
                 }
             }
         }
-        
+        if ((string[i] < 65) || (string[i] > 90)){
+            result[i] = string[i];
+        }
         t = (t+1)%key_size;
     }
     result[string_size] = '\0';
@@ -84,20 +85,22 @@ char* encode(char* string, int string_size, char** cipher_pattern, char* key, in
 }
 
 // implement decode
-char* decode(char* encoded, int string_size, char** cipher_pattern, char* key, int key_size) {
+char* decode(char* string, int string_size, char** cipher_pattern, char* key, int key_size) {
     char* result = (char*)malloc((string_size+1)*sizeof(char));
     int t = 0;
     for (int i=0; i<string_size; i++){
         for (int j=1; j<27; j++){
-            if (cipher_pattern[j][0] == encoded[i]){
+            if (cipher_pattern[j][0] == key[t]){
                 for (int k=1; k<27; k++){
-                    if (cipher_pattern[j][k] == key[t]){
+                    if (cipher_pattern[j][k] == string[i]){
                         result[i] = cipher_pattern[0][k];
                     }
                 }
             }
         }
-        
+        if ((string[i] < 65) || (string[i] > 90)){
+            result[i] = string[i];
+        }
         t = (t+1)%key_size;
     }
     result[string_size] = '\0';
