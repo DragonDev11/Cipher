@@ -7,18 +7,22 @@
 
 FILE* file;
 
-int main(int argc, char* argv[]){
-    //printf("%s", argv[1]);
-    if ((strcmp(argv[1], "--v") == 0) || (strcmp(argv[1], "--version") == 0)){
+int main(int argc, char* argv[]) {
+    // التحقق من خيار الإصدارة
+    if ((strcmp(argv[1], "--v") == 0) || (strcmp(argv[1], "--version") == 0)) {
         printf("cipherx v1.0\nCopyright @DragonDev 2024-2025\n");
         return 0;
-    }else if (!((argc >= 4) && (argc <= 7))){
-        printf("\nUSAGE: cipherx <<mode>>\nMODES:\n\t g: generates a cipher pattern based on a cipher input\n\tAGRGUMENTS: <<cipher>> <<cipher_size>>\n\t e: encodes a regular text based on a cipher on input\n\tAGRGUMENTS: <<cipher>> <<cipher_size>> <<file_path>> <<key>> <<key_size>>\n\t d: decodes a regular text based on a cipher on input\n\tAGRGUMENTS: <<cipher>> <<cipher_size>> <<encoded_text_file_path>> <<key>> <<key_size>>\n\n");
+    } 
+    // التحقق من صحة المدخلات
+    else if (!((argc >= 4) && (argc <= 7))) {
+        printf("\nUSAGE: cipherx <<mode>>\nMODES:\n\t g: generates a cipher pattern based on a cipher input\n\tARGUMENTS: <<cipher>> <<cipher_size>>\n\t e: encodes a regular text based on a cipher on input\n\tARGUMENTS: <<cipher>> <<cipher_size>> <<file_path>> <<key>> <<key_size>>\n\t d: decodes a regular text based on a cipher on input\n\tARGUMENTS: <<cipher>> <<cipher_size>> <<encoded_text_file_path>> <<key>> <<key_size>>\n\n");
         return 0;
     }
+
+    // توليد نمط الشيفرة
     char** cipher_pattern = generate_cipher_pattern(argv[2], atoi(argv[3]));
 
-    if (cipher_pattern == NULL){
+    if (cipher_pattern == NULL) {
         printf("Error: duplicates had been found");
         return 1;
     }
@@ -32,33 +36,8 @@ int main(int argc, char* argv[]){
     }
 
     int current_size = 0;
-    
-    //HashNode* dictionary = (HashNode*)malloc(current_size*sizeof(HashNode));
-    
-    /*
-    char* key = "-gen";
-    int value = 0;
-    int result = insert_element(&dictionary, &current_size, &key, 's', &value, 'i');
-    if (result == 2){
-        printf("Failed to insert_element -gen, key already exists\0");
-    }
-    //printf("\n%d\n", result);
-    key = "-dec";
-    value = 1;
-    result = insert_element(&dictionary, &current_size, &key, 's', &value, 'i');
-    if (result == 2){
-        printf("Failed to insert_element -dec, key already exists\0");
-    }
-    //printf("\n%d\n", result);
-    key = "-enc";
-    value = 2;
-    result = insert_element(&dictionary, &current_size, &key, 's', &value, 'i');
-    if (result == 2){
-        printf("Failed to insert_element -enc, key already exists\0");
-    }
-    //printf("\n%d\n", result);
-    */
 
+    // تحديد المتغيرات المستخدمة في العمليات
     char* file_path = NULL;
     char* key_input = NULL;
     char* text;
@@ -67,22 +46,8 @@ int main(int argc, char* argv[]){
     int i = 0;
     char c;
 
-    //for (int i=0; i<current_size; i++){
-      //  printf("Key: %s, Value: %d\n", *(char**)dictionary[i].key, *(int*)dictionary[i].value);
-    //}
-
-    /*void* returned_value = get_value(dictionary, current_size, argv[1], 's');
-    if (returned_value == NULL) {
-        printf("\nMode not found for key: %s\n", argv[1]);
-        return 1;
-    }
-    int mode = *(int*)returned_value;*/
-
-    //printf("\n%d\n", atoi(argv[1]));
-
-    //printf("\n%s, %d, %d\n", argv[1], mode, current_size);
-    
-    switch (argv[1][0]){
+    // التعامل مع الأوامر المدخلة
+    switch (argv[1][0]) {
         case 'g':
             file_path = "output.txt";
             print_to_console(cipher_pattern);
@@ -90,23 +55,24 @@ int main(int argc, char* argv[]){
             fclose(file);
             printf("created %s\n", file_path);
             break;
+
         case 'd':
             file_path = argv[4];
             key_input = argv[5];
             key_size = atoi(argv[6]);
             file = fopen(file_path, "r");
-            if (file == NULL){
+            if (file == NULL) {
                 printf("\nPlease check if %s exists\n", file_path);
                 free(cipher_pattern);
                 return 0;
             }
 
-            for (int i=0; i<key_size; i++){
-                if (key_input[i] == '\0'){
-                    key_size = i+1;
+            for (int i = 0; i < key_size; i++) {
+                if (key_input[i] == '\0') {
+                    key_size = i + 1;
                     break;
                 }
-                if ((key_input[i] >= 97) && (key_input[i] <= 122)){
+                if ((key_input[i] >= 97) && (key_input[i] <= 122)) {
                     key_input[i] -= 32;
                 }
             }
@@ -115,10 +81,10 @@ int main(int argc, char* argv[]){
             size = ftell(file);
             rewind(file);
 
-            text = (char*)malloc((size+1)*sizeof(char));
+            text = (char*)malloc((size + 1) * sizeof(char));
             i = 0;
-            while ((c = fgetc(file)) != EOF){
-                if ((c >= 97) && (c <= 122)){
+            while ((c = fgetc(file)) != EOF) {
+                if ((c >= 97) && (c <= 122)) {
                     c -= 32;
                 }
                 text[i] = c;
@@ -127,11 +93,11 @@ int main(int argc, char* argv[]){
 
             text[i] = '\0';
 
-            char* decoded_text = decode(text, i+1, cipher_pattern, key_input, key_size);
+            char* decoded_text = decode(text, i + 1, cipher_pattern, key_input, key_size);
 
             file = fopen("decoded_text.txt", "w");
 
-            if (file == NULL){
+            if (file == NULL) {
                 printf("\nCould not open the file\n");
                 return 1;
             }
@@ -140,24 +106,24 @@ int main(int argc, char* argv[]){
             fclose(file);
             printf("created %s\n", file_path);
             break;
+
         case 'e':
             file_path = argv[4];
             key_input = argv[5];
             key_size = atoi(argv[6]);
             file = fopen(file_path, "r");
-            if (file == NULL){
+            if (file == NULL) {
                 printf("\nPlease check if %s exists\n", file_path);
                 free(cipher_pattern);
-                
                 return 0;
             }
 
-            for (int i=0; i<key_size; i++){
-                if (key_input[i] == '\0'){
-                    key_size = i+1;
+            for (int i = 0; i < key_size; i++) {
+                if (key_input[i] == '\0') {
+                    key_size = i + 1;
                     break;
                 }
-                if ((key_input[i] >= 97) && (key_input[i] <= 122)){
+                if ((key_input[i] >= 97) && (key_input[i] <= 122)) {
                     key_input[i] -= 32;
                 }
             }
@@ -166,10 +132,10 @@ int main(int argc, char* argv[]){
             size = ftell(file);
             rewind(file);
 
-            text = (char*)malloc((size+1)*sizeof(char));
+            text = (char*)malloc((size + 1) * sizeof(char));
             i = 0;
-            while ((c = fgetc(file)) != EOF){
-                if ((c >= 97) && (c <= 122)){
+            while ((c = fgetc(file)) != EOF) {
+                if ((c >= 97) && (c <= 122)) {
                     c -= 32;
                 }
                 text[i] = c;
@@ -178,11 +144,11 @@ int main(int argc, char* argv[]){
 
             text[i] = '\0';
 
-            char* encoded_text = encode(text, i+1, cipher_pattern, key_input, key_size);
+            char* encoded_text = encode(text, i + 1, cipher_pattern, key_input, key_size);
 
             file = fopen("encoded_text.txt", "w");
 
-            if (file == NULL){
+            if (file == NULL) {
                 printf("\nCould not open the file\n");
                 return 1;
             }
@@ -191,9 +157,9 @@ int main(int argc, char* argv[]){
             fclose(file);
             printf("created %s\n", file_path);
             break;
-        
+
         default:
-            printf("\nUSAGE: .\\main.exe <<mode>>\nMODES:\n\t -gen: generates a cipher pattern based on a cipher input\tAGRGUMENTS: <<cipher>> <<cipher_size>>\n\t -enc: encodes a regular text based on a cipher on input\tAGRGUMENTS: <<cipher>> <<cipher_size>> <<file_path>> <<key>> <<key_size>>\n\t -dec: decodes a regular text based on a cipher on input\tAGRGUMENTS: <<cipher>> <<cipher_size>> <<encoded_text_file_path>> <<key>> <<key_size>>\n\n");
+            printf("\nUSAGE: .\\main.exe <<mode>>\nMODES:\n\t -gen: generates a cipher pattern based on a cipher input\tARGUMENTS: <<cipher>> <<cipher_size>>\n\t -enc: encodes a regular text based on a cipher on input\tARGUMENTS: <<cipher>> <<cipher_size>> <<file_path>> <<key>> <<key_size>>\n\t -dec: decodes a regular text based on a cipher on input\tARGUMENTS: <<cipher>> <<cipher_size>> <<encoded_text_file_path>> <<key>> <<key_size>>\n\n");
             for (int i = 0; i < 27; i++) {
                 free(cipher_pattern[i]);
             }
@@ -202,15 +168,13 @@ int main(int argc, char* argv[]){
             break;
     }
 
-    
-
+    // تحرير الذاكرة المستخدمة
     for (int i = 0; i < 27; i++) {
         free(cipher_pattern[i]);
     }
     free(cipher_pattern);
 
     printf("\n");
-    
 
     return 0;
 }
