@@ -8,18 +8,14 @@
 FILE* file;
 
 int main(int argc, char* argv[]) {
-    // التحقق من خيار الإصدارة
     if ((strcmp(argv[1], "--v") == 0) || (strcmp(argv[1], "--version") == 0)) {
         printf("cipherx v1.0\nCopyright @DragonDev 2024-2025\n");
         return 0;
-    } 
-    // التحقق من صحة المدخلات
-    else if (!((argc >= 4) && (argc <= 7))) {
+    }else if (!((argc >= 4) && (argc <= 7))) {
         printf("\nUSAGE: cipherx <<mode>>\nMODES:\n\t g: generates a cipher pattern based on a cipher input\n\tARGUMENTS: <<cipher>> <<cipher_size>>\n\t e: encodes a regular text based on a cipher on input\n\tARGUMENTS: <<cipher>> <<cipher_size>> <<file_path>> <<key>> <<key_size>>\n\t d: decodes a regular text based on a cipher on input\n\tARGUMENTS: <<cipher>> <<cipher_size>> <<encoded_text_file_path>> <<key>> <<key_size>>\n\n");
         return 0;
     }
 
-    // توليد نمط الشيفرة
     char** cipher_pattern = generate_cipher_pattern(argv[2], atoi(argv[3]));
 
     if (cipher_pattern == NULL) {
@@ -37,7 +33,6 @@ int main(int argc, char* argv[]) {
 
     int current_size = 0;
 
-    // تحديد المتغيرات المستخدمة في العمليات
     char* file_path = NULL;
     char* key_input = NULL;
     char* text;
@@ -46,7 +41,6 @@ int main(int argc, char* argv[]) {
     int i = 0;
     char c;
 
-    // التعامل مع الأوامر المدخلة
     switch (argv[1][0]) {
         case 'g':
             file_path = "output.txt";
@@ -168,7 +162,6 @@ int main(int argc, char* argv[]) {
             break;
     }
 
-    // تحرير الذاكرة المستخدمة
     for (int i = 0; i < 27; i++) {
         free(cipher_pattern[i]);
     }
